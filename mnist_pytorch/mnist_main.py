@@ -165,8 +165,8 @@ def build_mnist_mlp():
     mlp.load_data()
     mlp.build_model()
     mlp.train()
-    # mlp.save_model('mlp-%d-%d-%depoch.npy' % (h1, h2, e))
-    mlp.load_model('mlp-%d-%d-%depoch.pth' % (h1, h2, e))
+    mlp.save_model('mlp-%d-%d-%depoch.npy' % (h1, h2, e))
+    # mlp.load_model('mlp-%d-%d-%depoch.pth' % (h1, h2, e))
     return mlp
 
 
