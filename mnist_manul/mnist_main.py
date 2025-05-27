@@ -24,7 +24,7 @@ class MNIST_MLP(object):
         self.print_iter = print_iter
         self.lowest_loss = float("inf")
 
-    def load_mnist(self, file_dir, is_images='True'):
+    def load_mnist(self, file_dir, is_images=True):
         bin_file = open(file_dir, 'rb')
         bin_data = bin_file.read()
         bin_file.close()
@@ -38,9 +38,9 @@ class MNIST_MLP(object):
             num_rows, num_cols = 1, 1
         data_size = num_images * num_rows * num_cols
         mat_data = struct.unpack_from('>' + str(data_size) + 'B', bin_data, struct.calcsize(fmt_header))
-
         mat_data = np.reshape(mat_data, [num_images, num_rows * num_cols])
         print('Load images from %s, number: %d, data shape: %s' % (file_dir, num_images, str(mat_data.shape)))
+
         return mat_data
 
     def load_data(self):
@@ -124,11 +124,13 @@ class MNIST_MLP(object):
                 self.backward()
                 self.update(self.lr)
                 if idx_batch % self.print_iter == 0:
-                   print('Epoch %d, iter %d, loss: %.6f' % (idx_epoch, idx_batch, loss))
-                   if(loss < self.lowest_loss):
+                    print(f'Epoch [{idx_epoch + 1}/{self.max_epoch}], '
+                          f'Iter [{idx_batch}/{max_batch}], '
+                          f'Loss: {loss:.6f}')
+                    if loss < self.lowest_loss:
                         self.lowest_loss = loss
-                        print('find lowest loss, saving model')
                         self.save_model('mlp-%d-%d-%depoch.npy' % (self.hidden1, self.hidden2, self.max_epoch))
+                        print('Find lowest loss, model saved.')
 
     def evaluate(self):
         pred_results = np.zeros([self.test_data.shape[0]])
@@ -138,10 +140,10 @@ class MNIST_MLP(object):
             pred_labels = np.argmax(prob, axis=1)
             pred_results[idx * self.batch_size:(idx + 1) * self.batch_size] = pred_labels
         accuracy = np.mean(pred_results == self.test_data[:, -1])
-        print('Accuracy in test  set:%f' % accuracy)
+        print('Accuracy in test set:%f' % accuracy)
 
 
-def build_mnist_mlp(param_dir='weight.npy'):
+def build_mnist_mlp():
     h1, h2, e = 128, 64, 20
     mlp = MNIST_MLP(hidden1=h1, hidden2=h2, max_epoch=e)
     mlp.load_data()
