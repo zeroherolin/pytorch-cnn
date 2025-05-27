@@ -1,7 +1,9 @@
 - Numpy手动实现Mnist_MLP
 
-[minst_manul](minst_manul)
+[mnist_manul](mnist_manul/)
 
 - 基于Pytorch框架实现Mnist_MLP
 
-[minst_pytorch](minst_pytorch)
+[mnist_pytorch](mnist_pytorch/)
+
+- Updating
