@@ -3,60 +3,6 @@
 import numpy as np
 
 
-def im2col(input_data, filter_h, filter_w, pad_h, pad_w, stride_h, stride_w):
-    """图像转列向量格式"""
-    N, C, H, W = input_data.shape
-    # 计算输出特征图尺寸
-    out_h = (H + 2 * pad_h - filter_h) // stride_h + 1
-    out_w = (W + 2 * pad_w - filter_w) // stride_w + 1
-
-    # 填充输入数据
-    img = np.pad(input_data, [(0, 0), (0, 0), (pad_h, pad_h), (pad_w, pad_w)], mode='constant')
-
-    # 使用跨步技巧构建列向量
-    shape = (N, C, filter_h, filter_w, out_h, out_w)
-    strides = (*img.strides[:-2], img.strides[-2] * stride_h, img.strides[-1] * stride_w, *img.strides[-2:])
-
-    col = np.lib.stride_tricks.as_strided(
-        img,
-        shape=shape,
-        strides=strides,
-        writeable=False
-    )
-
-    # 调整维度顺序并重塑
-    col = col.transpose(0, 4, 5, 1, 2, 3).reshape(N * out_h * out_w, -1)
-    return col
-
-
-def col2im(col, input_shape, filter_h, filter_w, pad_h, pad_w, stride_h, stride_w):
-    """列向量转图像格式"""
-    N, C, H, W = input_shape
-    # 计算输出特征图尺寸
-    out_h = (H + 2 * pad_h - filter_h) // stride_h + 1
-    out_w = (W + 2 * pad_w - filter_w) // stride_w + 1
-
-    # 重塑并调整维度顺序
-    col = col.reshape(N, out_h, out_w, C, filter_h, filter_w).transpose(0, 3, 4, 5, 1, 2)
-
-    # 初始化填充后的图像
-    img = np.zeros((N, C, H + 2 * pad_h, W + 2 * pad_w))
-
-    # 将列向量数据累加回图像
-    for y in range(filter_h):
-        for x in range(filter_w):
-            y_start = y
-            x_start = x
-            img[:, :,
-            y_start:y_start + stride_h * out_h:stride_h,
-            x_start:x_start + stride_w * out_w:stride_w] += col[:, :, y, x, :, :]
-
-    # 移除填充
-    if pad_h > 0 or pad_w > 0:
-        img = img[:, :, pad_h:H + pad_h, pad_w:W + pad_w]
-    return img
-
-
 class FullyConnectedLayer(object):
     """全连接层"""
 
@@ -85,9 +31,9 @@ class FullyConnectedLayer(object):
         bottom_diff = np.matmul(top_diff, self.weight.T)
         return bottom_diff
 
-    def update_param(self, lr, reg=0.0005):
-        """参数更新（包含L2正则化）"""
-        self.weight -= lr * (self.d_weight + reg * self.weight)
+    def update_param(self, lr):
+        """参数更新"""
+        self.weight -= lr * self.d_weight
         self.bias -= lr * self.d_bias
 
     def load_param(self, weight, bias):
@@ -109,13 +55,11 @@ class ReLULayer(object):
     def forward(self, input):
         """前向传播：ReLU(x) = max(0, x)"""
         self.input = input  # 保存输入用于反向传播
-        output = np.maximum(0, self.input)
-        return output
+        return np.maximum(0, self.input)
 
     def backward(self, top_diff):
         """反向传播：梯度只通过正数区域"""
-        bottom_diff = top_diff * (self.input >= 0.)
-        return bottom_diff
+        return top_diff * (self.input >= 0.)
 
 
 class SoftmaxLossLayer(object):
@@ -145,8 +89,7 @@ class SoftmaxLossLayer(object):
 
     def backward(self):
         """反向传播：计算softmax层的梯度"""
-        bottom_diff = (self.prob - self.label_onehot) / self.batch_size
-        return bottom_diff
+        return (self.prob - self.label_onehot) / self.batch_size
 
 
 class ConvolutionalLayer(object):

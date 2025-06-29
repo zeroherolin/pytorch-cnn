@@ -74,7 +74,7 @@ class VGG19(object):
         self.layers['relu5_4'] = ReLULayer()
         self.layers['pool5'] = MaxPoolingLayer(2, 2)
 
-        # 分类头
+        # Block 6
         self.layers['flatten'] = FlattenLayer()
         self.layers['fc6'] = FullyConnectedLayer(25088, 4096)
         self.layers['relu6'] = ReLULayer()
@@ -125,18 +125,13 @@ class VGG19(object):
     def load_image(self, image_dir):
         """加载并预处理输入图像"""
         print(f'Loading and preprocessing image from {image_dir}')
-        img = Image.open(image_dir)
-        img = img.resize((224, 224))  # VGG输入尺寸为224x224
-        self.input_image = np.array(img).astype(np.float32)
-
-        # 减去图像均值
+        self.input_image = Image.open(image_dir)
+        self.input_image = self.input_image.resize((224, 224))  # VGG输入尺寸为224x224
+        self.input_image = np.array(self.input_image).astype(np.float32)
         self.input_image -= self.image_mean
-
-        # 调整维度顺序 [H, W, C] -> [C, H, W]
-        self.input_image = np.transpose(self.input_image, [2, 0, 1])
-
-        # 添加批次维度 [1, C, H, W]
-        self.input_image = np.expand_dims(self.input_image, axis=0)
+        self.input_image = np.reshape(self.input_image, [1] + list(self.input_image.shape))
+        # 调整图片维度顺序
+        self.input_image = np.transpose(self.input_image, [0, 3, 1, 2])
 
     def forward(self):
         """执行前向传播"""

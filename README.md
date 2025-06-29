@@ -2,8 +2,27 @@
 
 ## 快速跳转
 
-- [Mnist训练和推理](#Mnist训练和推理)
-- [VGG19模型推理](#VGG19模型推理)
+Basic
+- [Mnist训练和推理](#Mnist训练和推理) 手写数字识别
+
+CNN
+- [VGG19模型推理](#VGG19模型推理) 图像分类
+- [ResNet训练和推理](#ResNet训练和推理) 图像分类
+
+RNN
+- [LSTM训练和推理](#LSTM训练和推理) 文本生成
+- [GRU训练和推理](#GRU训练和推理) 情感分类
+
+RL
+- [DQN训练和推理](#DQN训练和推理) 游戏控制
+
+GAN
+- [CGAN训练和推理](#CGAN训练和推理) 图像生成
+- [DCGAN训练和推理](#DCGAN训练和推理) 人脸生成
+
+Transformer
+- [Transformer训练和推理](#Transformer训练和推理) 机器翻译
+- [ViT训练和推理](#ViT训练和推理) 图像分类
 
 ## 模型下载
 

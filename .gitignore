@@ -1,0 +1,12 @@
+.idea/
+*.iml
+modules.xml
+.idea_modules.xml
+*.ipr
+*.iws
+
+**/__pycache__/
+
+*.py[cod]
+
+assets/imagenet-vgg-verydeep-19.mat
