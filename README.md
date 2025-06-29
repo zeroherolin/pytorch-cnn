@@ -5,7 +5,7 @@
 - [Mnist训练和推理](#Mnist训练和推理)
 - [VGG19模型推理](#VGG19模型推理)
 
-## 数据集下载
+## 模型下载
 
 ```bash
 cd assets
